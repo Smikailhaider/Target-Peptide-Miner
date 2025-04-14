@@ -1,3 +1,4 @@
+#rsc_convergence_II
 from Bio import SeqIO
 import ast
 import os
