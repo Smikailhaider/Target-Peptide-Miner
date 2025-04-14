@@ -1,4 +1,3 @@
-#rsc_convergence_II
 from Bio import SeqIO
 import ast
 import os
@@ -659,20 +658,32 @@ class App(tk.Tk):
             '''
             return dp[len(dp) - 1][len(dp[0]) - 1][0]
 
-        def expected_score(ref,itr,sim):
+
+        def expected_score(ref,avg_mem_len,check_interval,sim,conv_thresh,min_itr=200,max_itr=1000):
             self_match = similarity(ref,ref)
             aa_list = 'ARNDCQEGHILKMFPSTWYV'
             sims = []
-            for i in range(itr):
+            last_avgs = []
+            line_val = 0
+            for i in range(max_itr):
                 prot_rand = ''
-                for i in range(len(ref)):
+                for j in range(len(ref)):
                     ind = randint(0,19)
                     prot_rand += aa_list[ind]
                 sims.append(similarity(prot_rand,ref))
-            return (sim)*(self_match) + (1-sim)*(sum(sims)/itr)
+                if i > avg_mem_len:
+                    del last_avgs[0]
+                last_avgs.append(sum(sims)/(i+1))
+                if i%check_interval == 0 and i >= min_itr:
+                    if stdev(last_avgs) <= conv_thresh:
+                        print(str(i)+' '+str(stdev(last_avgs[-avg_mem_len:]))+' '+str(sum(sims)/i))
+                        if line_val == 0:
+                            line_val = i
+                        return (sim)*(self_match) + (1-sim)*(sum(sims)/i)
+            return (sim)*(self_match) + (1-sim)*(sum(sims)/max_itr)
         
-        avg_exp_score_1,avg_exp_score_2 = expected_score(reference,250,pct_identity),expected_score(reference2,250,pct_identity)
-      
+        avg_exp_score_1,avg_exp_score_2 = expected_score(reference,25,25,pct_identity,0.1),expected_score(reference2,25,25,pct_identity,0.1)
+
         def findTarget(genome,reference):
             maxProt = (avg_exp_score_1,avg_exp_score_2, '')
             #maxProt = (-1,-1,'')
