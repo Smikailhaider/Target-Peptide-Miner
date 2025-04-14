@@ -1,3 +1,4 @@
+#rsc conv, pct_identity<0 support
 from Bio import SeqIO
 import ast
 import os
@@ -682,7 +683,10 @@ class App(tk.Tk):
                         return (sim)*(self_match) + (1-sim)*(sum(sims)/i)
             return (sim)*(self_match) + (1-sim)*(sum(sims)/max_itr)
         
-        avg_exp_score_1,avg_exp_score_2 = expected_score(reference,25,25,pct_identity,0.1),expected_score(reference2,25,25,pct_identity,0.1)
+        if pct_identity < 0:
+            avg_exp_score_1,avg_exp_score_2 = (-30*len(reference)),(-30*len(reference))
+        else:
+            avg_exp_score_1,avg_exp_score_2 = expected_score(reference,25,25,pct_identity,0.1),expected_score(reference2,25,25,pct_identity,0.1)
 
         def findTarget(genome,reference):
             maxProt = (avg_exp_score_1,avg_exp_score_2, '')
