@@ -12,6 +12,7 @@ import tkinter.scrolledtext as st
 import threading
 from idlelib.tooltip import Hovertip
 import time  
+from statistics import stdev
 today = str(date.today())
 
 def resource_path(relative_path):
