@@ -24,7 +24,10 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("TPM")
-        self.iconbitmap(resource_path("helix-removebg-preview.ico"))
+        try:
+            self.iconbitmap(resource_path("helix-removebg-preview.ico"))
+        except:
+            pass
         self.geometry("255x255")
         self.resizable(False,False)
         self.selected_file = ''
