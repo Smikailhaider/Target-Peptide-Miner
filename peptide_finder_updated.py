@@ -1,4 +1,3 @@
-#rsc conv, pct_identity<0 support
 from Bio import SeqIO
 import ast
 import os
@@ -11,7 +10,7 @@ from tkinter import filedialog
 import tkinter.scrolledtext as st 
 import threading
 from idlelib.tooltip import Hovertip
-import time  
+import time
 from statistics import stdev
 today = str(date.today())
 
@@ -663,13 +662,12 @@ class App(tk.Tk):
             '''
             return dp[len(dp) - 1][len(dp[0]) - 1][0]
 
-
+        
         def expected_score(ref,avg_mem_len,check_interval,sim,conv_thresh,min_itr=200,max_itr=1000):
             self_match = similarity(ref,ref)
             aa_list = 'ARNDCQEGHILKMFPSTWYV'
             sims = []
             last_avgs = []
-            line_val = 0
             for i in range(max_itr):
                 prot_rand = ''
                 for j in range(len(ref)):
@@ -681,16 +679,15 @@ class App(tk.Tk):
                 last_avgs.append(sum(sims)/(i+1))
                 if i%check_interval == 0 and i >= min_itr:
                     if stdev(last_avgs) <= conv_thresh:
-                        print(str(i)+' '+str(stdev(last_avgs[-avg_mem_len:]))+' '+str(sum(sims)/i))
-                        if line_val == 0:
-                            line_val = i
                         return (sim)*(self_match) + (1-sim)*(sum(sims)/i)
             return (sim)*(self_match) + (1-sim)*(sum(sims)/max_itr)
+        
         
         if pct_identity < 0:
             avg_exp_score_1,avg_exp_score_2 = (-30*len(reference)),(-30*len(reference))
         else:
-            avg_exp_score_1,avg_exp_score_2 = expected_score(reference,25,25,pct_identity,0.1),expected_score(reference2,25,25,pct_identity,0.1)
+            #avg_exp_score_1,avg_exp_score_2 = expected_score(reference,25,25,pct_identity,0.1),expected_score(reference2,25,25,pct_identity,0.1)
+            avg_exp_score_1,avg_exp_score_2 = pct_identity*similarity(reference,reference),pct_identity*similarity(reference2,reference2)
 
         def findTarget(genome,reference):
             maxProt = (avg_exp_score_1,avg_exp_score_2, '')
@@ -724,7 +721,7 @@ class App(tk.Tk):
                             bestProtein = findTarget(record.seq[search_range[0]:search_range[1]].upper(), reference)
                         except:
                             bestProtein = findTarget(record.seq[search_range[0]:len(record.seq)].upper(), reference)
-                    if len(bestProtein[2]) < (len(paramsList[0])*0.97) or len(bestProtein[2]) > (len(paramsList[0])*1.03):
+                    if len(bestProtein[2]) ==0:
                         bad_ones.append(record.id)
                     else:
                         '''
@@ -838,7 +835,7 @@ class App(tk.Tk):
                         if s1[i - 1] == s2[j - 1]:
                             ms = 1
                         dp[i][j] = max((dp[i - 1][j - 1] + ms), (dp[i - 1][j] - 1), (dp[i][j - 1] - 1))
-            return len(s2) - dp[len(dp) - 1][len(dp[0]) - 1]
+            return -1*dp[len(dp) - 1][len(dp[0]) - 1]
 
         # ***************checking peptides************************
         def checking(peps, alg, interest):
